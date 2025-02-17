@@ -2,6 +2,8 @@
 import streamlit as st
 from openai import OpenAI
 import os
+import streamlit_authenticator as stauth
+
 
 # Get your OpenAI API key from environment variables 
 api_key = os.getenv("OPENAI_API_KEY")  # Used in production
@@ -18,7 +20,7 @@ def analyze_text(text):
         return
     
     client = OpenAI(api_key=api_key)
-    model = "gpt-4o"  # Using the GPT-3.5 model
+    model = "gpt-4o"  # Using the GPT-4o model
 
     # Instructions for the AI (adjust if needed)
     messages = [
@@ -62,3 +64,24 @@ if st.button('Generate Post Content'):
     with st.spinner('Generating Thumbnail...'):
         thumbnail_url = generate_image(user_input)  # Consider adjusting the prompt for image generation if needed
         st.image(thumbnail_url, caption='Generated Thumbnail')
+
+import yaml
+from yaml.loader import SafeLoader
+
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
+# Pre-hashing all plain text passwords once
+# stauth.Hasher.hash_passwords(config['credentials'])
+
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days']
+)
+
+try:
+    authenticator.login()
+except Exception as e:
+    st.error(e)
