@@ -98,4 +98,4 @@ elif st.session_state.get('authentication_status') == False:
 else:
     st.warning('Please enter your username and password')
 
-... (1 line left)
+
